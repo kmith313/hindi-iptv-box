@@ -1,9 +1,12 @@
 package com.desi.iptvtv
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.GestureDetector
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -45,8 +48,57 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupTouchGestures()
         showStatus(getString(R.string.loading))
         loadPlaylist()
+    }
+
+    // ---------------- Touch controls (phone / tablet / touch-enabled TV) ----------------
+    // Mirrors the D-pad behaviour: swipe left/right = browse, swipe down = open list,
+    // swipe up = close, single tap = open list (or confirm the highlighted channel).
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupTouchGestures() {
+        val detector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            private val SWIPE_DISTANCE_THRESHOLD = 60
+            private val SWIPE_VELOCITY_THRESHOLD = 80
+
+            override fun onDown(e: MotionEvent) = true
+
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                if (channels.isEmpty()) return false
+                if (overlayVisible) confirmPreview() else openSwitchOverlay()
+                return true
+            }
+
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+                if (channels.isEmpty() || e1 == null) return false
+                val diffX = e2.x - e1.x
+                val diffY = e2.y - e1.y
+                if (kotlin.math.abs(diffX) > kotlin.math.abs(diffY)) {
+                    if (kotlin.math.abs(diffX) > SWIPE_DISTANCE_THRESHOLD &&
+                        kotlin.math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD
+                    ) {
+                        movePreview(if (diffX > 0) -1 else 1)
+                        return true
+                    }
+                } else {
+                    if (kotlin.math.abs(diffY) > SWIPE_DISTANCE_THRESHOLD &&
+                        kotlin.math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD
+                    ) {
+                        if (diffY > 0) openSwitchOverlay() else hideSwitchOverlay(revert = true)
+                        return true
+                    }
+                }
+                return false
+            }
+        })
+        binding.root.setOnTouchListener { _, event -> detector.onTouchEvent(event) }
     }
 
     private fun loadPlaylist() {
