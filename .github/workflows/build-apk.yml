@@ -18,8 +18,8 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Point Gradle at the runner's preinstalled Android SDK
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: Set up Gradle (no local wrapper needed)
         uses: gradle/actions/setup-gradle@v4
