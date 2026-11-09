@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Hindi IPTV Box</string>
+    <string name="loading">Channel list load ho rahi hai…</string>
+    <string name="load_failed">Internet check karein, list load nahi ho payi</string>
+    <string name="no_channel">Koi channel nahi mila</string>
+    <string name="channel_unavailable">Ye channel abhi available nahi hai</string>
+</resources>
