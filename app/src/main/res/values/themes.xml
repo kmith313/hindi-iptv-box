@@ -3,6 +3,10 @@
         <item name="android:windowBackground">@color/black</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
+        <!-- Tells old Fire TV / Android TV boxes to draw into the overscan-reserved
+             border area too, instead of shrinking the app to leave a black frame
+             around it on 32" / older TVs. -->
+        <item name="android:windowOverscan">true</item>
         <item name="colorPrimary">@color/accent</item>
         <item name="colorAccent">@color/highlight</item>
     </style>

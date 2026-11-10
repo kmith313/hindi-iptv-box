@@ -10,6 +10,9 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -48,9 +51,27 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        enterImmersiveFullscreen()
         setupTouchGestures()
         showStatus(getString(R.string.loading))
         loadPlaylist()
+    }
+
+    // Draws truly edge-to-edge (no space reserved for a status/nav bar), so the
+    // picture fills the whole physical screen instead of looking "zoomed out"
+    // with a border on TVs that don't show those bars anyway.
+    private fun enterImmersiveFullscreen() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, binding.root).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) enterImmersiveFullscreen()
     }
 
     // ---------------- Touch controls (phone / tablet / touch-enabled TV) ----------------
@@ -269,6 +290,14 @@ class MainActivity : AppCompatActivity() {
         binding.previewNumber.text = (previewIndex + 1).toString()
         binding.previewName.text = channel.name
         binding.previewCategory.text = channel.category ?: ""
+
+        // Show the channel just before/after the highlighted one so it's obvious,
+        // at a glance, which one is currently selected.
+        val count = channels.size
+        val prevIdx = ((previewIndex - 1) % count + count) % count
+        val nextIdx = (previewIndex + 1) % count
+        binding.prevChannelName.text = "◀ " + (channels.getOrNull(prevIdx)?.name ?: "")
+        binding.nextChannelName.text = (channels.getOrNull(nextIdx)?.name ?: "") + " ▶"
     }
 
     private fun updateNowPlayingChip(channel: Channel, flashThenHide: Boolean) {

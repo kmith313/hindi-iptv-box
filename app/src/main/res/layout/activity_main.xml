@@ -25,13 +25,16 @@
         android:gravity="center"
         android:visibility="gone" />
 
-    <!-- Small "now playing" chip, top-left, auto-fades -->
+    <!-- Small "now playing" chip, top-left, auto-fades.
+         Margin follows the Android TV "safe area" (~48dp sides / ~27dp top-bottom)
+         so it isn't clipped on TVs that overscan-crop the outer edge of the picture. -->
     <LinearLayout
         android:id="@+id/nowPlayingChip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|start"
-        android:layout_margin="24dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="27dp"
         android:background="@color/overlay_bg"
         android:orientation="horizontal"
         android:gravity="center_vertical"
@@ -60,7 +63,9 @@
             android:text="Channel" />
     </LinearLayout>
 
-    <!-- Bottom channel-switch overlay: appears on DOWN, Left/Right browses, OK confirms -->
+    <!-- Bottom channel-switch overlay: appears on DOWN, Left/Right browses, OK confirms.
+         27dp bottom safe-area padding on top of the existing 18dp so the row never
+         sits under a TV's overscan-cropped edge. -->
     <LinearLayout
         android:id="@+id/switchOverlay"
         android:layout_width="match_parent"
@@ -69,9 +74,11 @@
         android:orientation="vertical"
         android:background="@color/overlay_bg"
         android:paddingTop="18dp"
-        android:paddingBottom="18dp"
+        android:paddingBottom="45dp"
         android:visibility="gone">
 
+        <!-- Previous / CURRENT (boxed+bordered) / Next, so it's unmistakable which
+             channel the remote has highlighted right now. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -79,29 +86,65 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/previewNumber"
+                android:id="@+id/prevChannelName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end|center_vertical"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:paddingEnd="16dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp"
+                android:text="◀" />
+
+            <LinearLayout
+                android:id="@+id/previewBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/highlight"
-                android:textStyle="bold"
-                android:textSize="40sp"
-                android:text="1" />
+                android:background="@drawable/preview_highlight_bg"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/previewNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/highlight"
+                    android:textStyle="bold"
+                    android:textSize="40sp"
+                    android:text="1" />
+
+                <TextView
+                    android:id="@+id/previewName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:textSize="32sp"
+                    android:text="Channel Name" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/previewName"
-                android:layout_width="wrap_content"
+                android:id="@+id/nextChannelName"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:textColor="@color/text_primary"
-                android:textSize="32sp"
-                android:text="Channel Name" />
+                android:layout_weight="1"
+                android:gravity="start|center_vertical"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:paddingStart="16dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp"
+                android:text="▶" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/previewCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:gravity="center"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
@@ -114,7 +157,7 @@
             android:gravity="center"
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
-            android:text="Left / Right se channel badlein • OK dabakar dekhein • Back se band karein" />
+            android:text="Left / Right se channel badlein • OK dabakar confirm karein • Back se band karein" />
     </LinearLayout>
 
 </FrameLayout>
